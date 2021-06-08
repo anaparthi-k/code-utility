@@ -1,0 +1,17 @@
+[$NAMESPACE_LIST]
+namespace GR.Smart.API.Controllers
+{
+    [UserAuthorize]
+    [Route("api/v1/[$CONTROLLER_PATH]")]
+    [ApiController]
+    public class [$MODEL_NAME]Controller : ControllerBase
+    {
+        private readonly [$MODEL_TYPE_NAME] [$MODEL_VARIABLE];
+
+        public [$MODEL_NAME]Controller([$MODEL_TYPE_NAME] [$MODEL_PARAM])
+        {
+            this.[$MODEL_VARIABLE] = [$MODEL_PARAM];
+        }
+
+[$METHOD_WRAPPERS]    }
+}

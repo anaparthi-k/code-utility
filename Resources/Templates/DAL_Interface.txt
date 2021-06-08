@@ -1,0 +1,7 @@
+[$NAMESPACE_LIST]
+namespace [$MODEL_DATA_NAMESPACE]
+{
+    public interface [$MODEL_NAME]
+    {
+[$METHOD_SIGNATURES]    }
+}

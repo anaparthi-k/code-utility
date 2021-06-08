@@ -1,0 +1,14 @@
+[$NAMESPACE_LIST]
+namespace GR.Smart.BL
+{
+    public class [$MODEL_NAME] : [$MODEL_FULL_NAME]
+    {
+        private readonly [$MODEL_DATA_NAMESPACE].[$MODEL_SHORT_NAME] [$MODEL_VARIABLE];
+
+        public [$MODEL_NAME]([$MODEL_DATA_NAMESPACE].[$MODEL_SHORT_NAME] [$MODEL_PARAM])
+        {
+            this.[$MODEL_VARIABLE] = [$MODEL_PARAM];
+        }
+
+[$METHOD_WRAPPERS]    }
+}

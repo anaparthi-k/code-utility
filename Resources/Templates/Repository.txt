@@ -1,0 +1,16 @@
+[$NAMESPACE_LIST]
+namespace GR.Smart.DB.MySQL.Repository
+{
+    public class [$MODEL_NAME] : SmartContext, [$MODEL_TYPE_NAME]
+    {
+        private readonly IMapper _mapper;
+        private readonly IHttpContextAccessor _httpContext;
+
+        public [$MODEL_NAME](IMapper mapper, IHttpContextAccessor httpContext)
+        {
+            this._mapper = mapper;
+            this._httpContext = httpContext;
+        }
+
+[$METHOD_WRAPPERS]    }
+}

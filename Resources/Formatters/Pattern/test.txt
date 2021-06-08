@@ -1,0 +1,9 @@
+hello 
+
+[$namespace_list]
+
+[$property_list]
+
+[$method_list]
+
+[$parameter_list]

@@ -1,0 +1,30 @@
+{
+  "propertyCollection": [
+    {
+      "name": "property_list",
+      "file": "PropertyFormatter.txt",
+      "format": "public [$property_type_csharp_type] [$property_name_camel_case];\r\n",
+      "pattern": "",
+      "includePattern": true
+    }
+  ],
+  "cleanUpNamespaces": false,
+  "methodCollection": [
+    {
+      "name": "method_list",
+      "file": "MethodFormatter.txt",
+      "format": "public [$method_name] [$method_name_camel_case];\r\n[$method_invoke] \r\n [$parameter_list]",
+      "pattern": "",
+      "includePattern": true
+    }
+  ],
+  "parameterCollection": [
+    {
+      "name": "parameter_list",
+      "file": "MethodFormatter.txt",
+      "format": "public [$parameter_name_camel_case] [$parameter_name_upper];\r\n",
+      "pattern": "",
+      "includePattern": true
+    }
+  ]
+}
