@@ -1,0 +1,446 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Text;
+
+namespace System.Reflection
+{
+    public static class ConverterExtensions
+    {
+        public static string GetClassStructure(this MethodInfo method)
+        {
+            StringBuilder structure = new StringBuilder();
+
+            var parameters = method.GetParameters();
+
+            foreach (var parameter in parameters)
+            {
+
+            }
+
+            return structure.ToString();
+        }
+
+        private static string GetProperName(string name)
+        {
+            return char.ToUpper(name[0]) + name.Substring(1);
+        }
+    }
+}
+
+
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+using System.Text;
+using System.Linq;
+
+namespace System.Reflection
+{
+    public static class MethodSignatureTools
+    {
+        public static string GetSignature(this MethodInfo method, bool invokable) {
+
+            var signatureBuilder = new StringBuilder();
+
+            // Add our method accessors if it's not invokable
+            if (!invokable) {
+                signatureBuilder.Append(GetMethodAccessorSignature(method));
+                signatureBuilder.Append(" ");
+            }
+
+            // Add method name
+            signatureBuilder.Append(method.Name);
+
+            // Add method generics
+            if (method.IsGenericMethod) {
+                signatureBuilder.Append(GetGenericSignature(method));
+            }
+
+            // Add method parameters
+            signatureBuilder.Append(GetMethodArgumentsSignature(method, invokable));
+
+            return signatureBuilder.ToString();
+        }
+
+        public static string GetMethodAccessorSignature(this MethodInfo method) {
+            string signature = null;
+
+            if (method.IsAssembly) {
+                signature = "internal ";
+
+                if (method.IsFamily)
+                    signature += "protected ";
+            } else if (method.IsPublic) {
+                signature = "public ";
+            } else if (method.IsPrivate) {
+                signature = "private ";
+            } else if (method.IsFamily) {
+                signature = "protected ";
+            }
+
+            if (method.IsStatic)
+                signature += "static ";
+
+            signature += TypeSignatureTools.GetSignature(method.ReturnType);
+
+            return signature;
+        }
+
+        public static string GetGenericSignature(this MethodInfo method) {
+            if (method == null) throw new ArgumentNullException(nameof(method));
+            if (!method.IsGenericMethod) throw new ArgumentException($"{method.Name} is not generic.");
+
+            return TypeSignatureTools.BuildGenericSignature(method.GetGenericArguments());
+        }
+
+        public static string GetMethodArgumentsSignature(this MethodInfo method, bool invokable) {
+            var isExtensionMethod = method.IsDefined(typeof(System.Runtime.CompilerServices.ExtensionAttribute), false);
+            var methodParameters = method.GetParameters().AsEnumerable();
+
+            // If this signature is designed to be invoked and it's an extension method
+            if (isExtensionMethod && invokable) {
+                // Skip the first argument
+                methodParameters = methodParameters.Skip(1);
+            }
+
+            var methodParameterSignatures = methodParameters.Select(param => {
+                var signature = string.Empty;
+
+                if (param.ParameterType.IsByRef)
+                    signature = "ref ";
+                else if (param.IsOut)
+                    signature = "out ";
+                else if (isExtensionMethod && param.Position == 0)
+                    signature = "this ";
+
+                if (!invokable) {
+                    signature += TypeSignatureTools.GetSignature(param.ParameterType) + " ";
+                }
+
+                signature += param.Name;
+
+                return signature;
+            });
+
+            var methodParameterString = "(" + string.Join(", ", methodParameterSignatures) + ")";
+
+            return methodParameterString;
+        }
+    }
+}
+
+
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Text;
+
+namespace System.Reflection
+{
+    public static class NamesExtensions
+    {
+        public static string GetCsharpName(this Type type)
+        {
+            var nullNestedType = Nullable.GetUnderlyingType(type);
+            if (nullNestedType != null)
+            {
+                var nullName = GetCsharpName(nullNestedType);
+                return nullName;
+            }
+
+            string name = null;
+            var code = Type.GetTypeCode(type);
+
+            switch (code)
+            {
+                case TypeCode.Empty:
+                    break;
+                case TypeCode.Object:
+                    name = type.Namespace + "." + type.Name;
+                    break;
+                case TypeCode.DBNull:
+                    break;
+                case TypeCode.Boolean:
+                    name = "bool";
+                    break;
+                case TypeCode.Char:
+                    name = "char";
+                    break;
+                case TypeCode.SByte:
+                    name = "sbyte";
+                    break;
+                case TypeCode.Byte:
+                    name = "byte";
+                    break;
+                case TypeCode.Int16:
+                    name = "short";
+                    break;
+                case TypeCode.UInt16:
+                    name = "ushort";
+                    break;
+                case TypeCode.Int32:
+                    name = "int";
+                    break;
+                case TypeCode.UInt32:
+                    name = "uint";
+                    break;
+                case TypeCode.Int64:
+                    name = "long";
+                    break;
+                case TypeCode.UInt64:
+                    name = "ulong";
+                    break;
+                case TypeCode.Single:
+                    name = "float";
+                    break;
+                case TypeCode.Double:
+                    name = "double";
+                    break;
+                case TypeCode.Decimal:
+                    name = "decimal";
+                    break;
+                case TypeCode.DateTime:
+                    name = "System.DateTime";
+                    break;
+                case TypeCode.String:
+                    name = "string";
+                    break;
+                default:
+                    break;
+            }
+
+            return name;
+        }
+
+        public static string GetVariableName(this Type type)
+        {
+            return "_" + GetParameterName(type);
+        }
+
+        public static string GetParameterName(this Type type)
+        {
+            string nameRef = type.Name;
+
+            if (type.IsInterface && char.ToLower(type.Name[0]) == 'i')
+                nameRef = type.Name.Substring(1);
+            
+            if (typeof(IEnumerable).IsAssignableFrom(type))
+            {
+                return "items";
+            }
+
+            string output = $"{char.ToLower(nameRef[0])}{nameRef.Substring(1)}";
+
+            return output;
+        }
+
+        public static string GetCodeName(this Type type)
+        {
+            if (type.IsInterface && char.ToLower(type.Name[0]) == 'i')
+               return type.Name.Substring(1);
+            return type.Name;
+        }
+        
+        public static string GetUrlRouteName(this Type type)
+        {
+            string name = type.Name;
+            if (type.IsInterface && char.ToLower(type.Name[0]) == 'i')
+                name=type.Name.Substring(1);
+
+            string output = name[0].ToString();
+
+            for (int i = 1; i < name.Length; i++)
+            {
+                if (char.IsUpper(name[i]))
+                {
+                    output += '-';
+                }
+
+                output += name[i];
+            }
+
+            return output.ToLower();
+        }
+    }
+}
+
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+namespace System.Reflection
+{
+    public static class TypeExtensionMethods
+    {
+        public static bool IsNullable(this Type type, out Type underlyingType)
+        {
+            underlyingType = Nullable.GetUnderlyingType(type);
+            return underlyingType != null;
+        }
+
+        /// <summary>
+        /// Is this type a generic type
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns>True if generic, otherwise False</returns>
+        public static bool IsGeneric(this Type type)
+        {
+            return type.IsGenericType
+                && type.Name.Contains("`");//TODO: Figure out why IsGenericType isn't good enough and document (or remove) this condition
+        }
+
+        /// <summary>
+        /// Gets the fully qualified type name of <paramref name="type"/>.
+        /// This will use any keywords in place of types where possible (string instead of System.String for example)
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns>The fully qualified name for <paramref name="type"/></returns>
+        public static string GetQualifiedTypeName(Type type)
+        {
+            string name = null;
+            var code = Type.GetTypeCode(type);
+
+            switch (code)
+            {
+                case TypeCode.Empty:
+                    break;
+                case TypeCode.Object:
+                    if (type.Name == "Void")
+                    {
+                        name = "void";
+                    }
+                   
+                    break;
+                case TypeCode.DBNull:
+                    break;
+                case TypeCode.Boolean:
+                    name = "bool";
+                    break;
+                case TypeCode.Char:
+                    name = "char";
+                    break;
+                case TypeCode.SByte:
+                    name = "sbyte";
+                    break;
+                case TypeCode.Byte:
+                    name = "byte";
+                    break;
+                case TypeCode.Int16:
+                    name = "short";
+                    break;
+                case TypeCode.UInt16:
+                    name = "ushort";
+                    break;
+                case TypeCode.Int32:
+                    name = "int";
+                    break;
+                case TypeCode.UInt32:
+                    name = "uint";
+                    break;
+                case TypeCode.Int64:
+                    name = "long";
+                    break;
+                case TypeCode.UInt64:
+                    name = "ulong";
+                    break;
+                case TypeCode.Single:
+                    name = "float";
+                    break;
+                case TypeCode.Double:
+                    name = "double";
+                    break;
+                case TypeCode.Decimal:
+                    name = "decimal";
+                    break;
+                case TypeCode.DateTime:
+                    name = "System.DateTime";
+                    break;
+                case TypeCode.String:
+                    name = "string";
+                    break;
+                default:
+                    break;
+            }
+
+            if (!string.IsNullOrEmpty(name))
+            {
+                return name;
+            }
+            //TODO: Figure out how type.FullName could be null and document (or remove) this conditional
+            var signature = string.IsNullOrWhiteSpace(type.FullName)
+                ? type.Name
+                : type.FullName;
+
+            if (IsGeneric(type))
+                signature = RemoveGenericTypeNameArgumentCount(signature);
+
+            return signature;
+        }
+
+
+        /// <summary>
+        /// This removes the `{argumentcount} from a the signature of a generic type
+        /// </summary>
+        /// <param name="genericTypeSignature">Signature of a generic type</param>
+        /// <returns><paramref name="genericTypeSignature"/> without any argument count</returns>
+        public static string RemoveGenericTypeNameArgumentCount(string genericTypeSignature)
+        {
+            return genericTypeSignature.Substring(0, genericTypeSignature.IndexOf('`'));
+        }
+    }
+}
+
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
+namespace System.Reflection
+{
+    public static class TypeSignatureTools
+    {
+        /// <summary>
+        /// Get a fully qualified signature for <paramref name="type"/>
+        /// </summary>
+        /// <param name="type">Type. May be generic or <see cref="Nullable{T}"/></param>
+        /// <returns>Fully qualified signature</returns>
+        public static string GetSignature(this Type type) {
+            var isNullableType = TypeExtensionMethods.IsNullable(type, out var underlyingNullableType);
+
+            var signatureType = isNullableType
+                ? underlyingNullableType
+                : type;
+
+            var isGenericType = TypeExtensionMethods.IsGeneric(signatureType);
+
+            var signature = TypeExtensionMethods.GetQualifiedTypeName(signatureType);
+
+            if (isGenericType) {
+                // Add the generic arguments
+                signature += BuildGenericSignature(signatureType.GetGenericArguments());
+            }
+
+            if (isNullableType) {
+                signature += "?";
+            }
+
+            return signature;
+        }
+
+        /// <summary>
+        /// Takes an <see cref="IEnumerable{T}"/> and creates a generic type signature (&lt;string, string&gt; for example)
+        /// </summary>
+        /// <param name="genericArgumentTypes"></param>
+        /// <returns>Generic type signature like &lt;Type, ...&gt;</returns>
+        public static string BuildGenericSignature(IEnumerable<Type> genericArgumentTypes) {
+            var argumentSignatures = genericArgumentTypes.Select(GetSignature);
+
+            return "<" + string.Join(", ", argumentSignatures) + ">";
+        }
+    }
+}
