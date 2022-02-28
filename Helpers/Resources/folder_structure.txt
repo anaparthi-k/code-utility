@@ -1,0 +1,65 @@
+﻿Home
+	Home
+Case Management
+	Create SAM Request
+		Sam Request Subsection
+		Sam Resolution Subsection
+		Member Information Subsection
+		Bp Engagement Details Subsection
+		Additional Info Tracking Subsection
+		CallTracking Section Subsection
+		Follow Up Needed Subsection
+	Create CRT Request
+		Crt Request Subsection
+		Crt Resolution Subsection
+		Group Information Subsection
+		Bulk Upload Subsection
+		Bp Engagement Details Subsection
+		Additional Info Tracking Subsection
+		Root Cause Tracking Subsection
+		Post Resolution Subsection
+		Adherence Section Subsection
+Activity Management
+	Create SAM Activity
+		Sam Request Subsection
+		Sam Resolution Subsection
+		Member Information Subsection
+		Bp Engagement Details Subsection
+		Additional Info Tracking Subsection
+		CallTracking Section Subsection
+		Follow Up Needed Subsection
+	Create CRT Projects
+		Crt Request Subsection
+		Crt Resolution Subsection
+		Group Information Subsection
+		Bulk Upload Subsection
+		Bp Engagement Details Subsection
+		Additional Info Tracking Subsection
+		Root Cause Tracking Subsection
+		Post Resolution Subsection
+		Adherence Section Subsection
+Search
+	Search Requests 
+	Search Activities 
+	Search Deliverables 
+	Search Capabilities 
+Non Production Time Tracker
+	Non Production Time Tracker
+Admin
+	Manage User 
+	Group Mapping 
+	Frequency Configuration 
+	Scorecard Update 
+	Notifications Configuration 
+	SMART Configurations 
+Supervisor Management
+	Supervisor Management
+Recurring Deliverables
+	Create Recurring Deliverables 
+Scorecard
+	Scorecard Generation 
+	Scorecard History 
+Capability Request
+	Create Capability Request 
+Report
+	Report
