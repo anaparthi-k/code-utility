@@ -1,0 +1,12 @@
+<div>
+    <span *ngIf="!isChild" [ngClass]="{'active':menuItem.isActive}" (click)="onRootItemClicked(menuItem)">{{menuItem.title}}</span>
+
+    <ng-container *ngIf="menuItem.childs.length;">
+        <ul>
+            <ng-container *ngFor="let child of menuItem.childs">
+                <li [ngClass]="{'active':child.isActive}" (click)="onSubItemClicked(child)">{{child.title}}</li>
+                <app-side-menu *ngIf="child.childs.length" [menuItem]=child [isChild]="true"></app-side-menu>
+            </ng-container>
+        </ul>
+    </ng-container>
+</div>
